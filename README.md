@@ -274,5 +274,3 @@ La prochaine phase utilisera l'univers de **6 cryptomonnaies retenues** pour :
 Année : 2025-2026
 ---
 
-
-# Projet-Python-crypto
