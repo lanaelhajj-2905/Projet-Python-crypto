@@ -1,0 +1,18 @@
+2026-01-01 16:29:19,327 - INFO - ============================================================
+2026-01-01 16:29:19,327 - INFO - DÉBUT ANALYSE UNIVERS CRYPTO
+2026-01-01 16:29:19,327 - INFO - ============================================================
+2026-01-01 16:29:21,970 - INFO - Exchange initialisé : binance
+2026-01-01 16:29:35,624 - INFO - Panel équilibré : 1000 jours | 18 actifs
+2026-01-01 16:29:35,626 - INFO - Log returns calculés: 999 observations
+2026-01-01 16:29:35,628 - INFO - Répertoire de sortie : C:\Users\HP\Documents\M2-222\M2 - 222 - S1\Python\Projet-Python-crypto\data\processed\universe
+2026-01-01 16:29:35,636 - INFO - Covariance annualisée
+2026-01-01 16:29:35,638 - INFO - Matrice de corrélation calculée
+2026-01-01 16:29:35,655 - INFO - Statistiques descriptives calculées
+2026-01-01 16:29:35,659 - INFO - Exporté: data\processed\universe\coverage_report.csv
+2026-01-01 16:29:35,689 - INFO - Exporté: data\processed\universe\prices_close.csv
+2026-01-01 16:29:35,744 - INFO - Exporté: data\processed\universe\log_returns.csv
+2026-01-01 16:29:35,747 - INFO - Exporté: data\processed\universe\covariance_daily.csv
+2026-01-01 16:29:35,750 - INFO - Exporté: data\processed\universe\covariance_annual.csv
+2026-01-01 16:29:35,753 - INFO - Exporté: data\processed\universe\correlation.csv
+2026-01-01 16:29:35,755 - INFO - Exporté: data\processed\universe\summary_statistics.csv
+2026-01-01 16:29:35,756 - INFO - Analyse univers terminée en 16.43s
