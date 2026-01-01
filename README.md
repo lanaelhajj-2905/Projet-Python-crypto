@@ -97,9 +97,9 @@ La sélection finale privilégie un **équilibre optimal entre diversification e
 - **DOGE** : Capture la dimension spéculative/irrationnelle du marché
 
 Cette configuration évite les écueils suivants :
-- ❌ Corrélations >0.9 : redondance informationnelle (ex: LTC/BCH trop proches de BTC)
-- ❌ Corrélations <0.1 : instabilité d'estimation GARCH
-- ❌ Actifs illiquides : bruit dans les données (SHIB, NEAR)
+- Corrélations >0.9 : redondance informationnelle (ex: LTC/BCH trop proches de BTC)
+- Corrélations <0.1 : instabilité d'estimation GARCH
+- Actifs illiquides : bruit dans les données (SHIB, NEAR)
 
 **Référence complète** : Voir `notebooks/universe-research.md` pour l'analyse bibliographique détaillée (Chen 2024, Kyriazis 2021, Adams & Füss 2017, etc.)
 
@@ -214,7 +214,7 @@ Tous les fichiers sont exportés dans `data/processed/universe/` :
 ### Installation
 
 ```bash
-git clone https://github.com/votre-username/projet-python-crypto.git
+git clone https://github.com/lanaelhajj-2905/Projet-Python-crypto
 cd projet-python-crypto
 
 python -m venv venv
@@ -229,7 +229,7 @@ pip install -r requirements.txt
 # Analyse de l'univers complet (18 cryptos)
 python main_universe.py
 
-# Durée estimée : Analyse univers termin�e en 16.43s
+# Durée estimée : Analyse univers terminée en 16.43s
 ```
 
 Les résultats sont automatiquement sauvegardés :
@@ -274,5 +274,3 @@ La prochaine phase utilisera l'univers de **6 cryptomonnaies retenues** pour :
 Année : 2025-2026
 ---
 
-
-# Projet-Python-crypto
