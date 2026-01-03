@@ -29,7 +29,7 @@ def load_from_binance(symbol: str, start: str, end: str) -> pd.Series:
     ])
     df["time"] = pd.to_datetime(df["time"], unit="ms")
     prices = df.set_index("time")["close"].astype(float)
-    logger.info(f"✅ Binance: {len(prices)} days")
+    logger.info(f"Binance: {len(prices)} days")
     return prices
 
 
@@ -37,7 +37,7 @@ def load_from_yahoo(ticker: str, start: str, end: str) -> pd.Series:
     """Télécharge depuis Yahoo Finance."""
     df = yf.download(ticker, start=start, end=end, progress=False)
     prices = df["Close"].squeeze()
-    logger.info(f"✅ Yahoo: {len(prices)} days")
+    logger.info(f"Yahoo: {len(prices)} days")
     return prices
 
 
@@ -53,7 +53,7 @@ def load_single(
         try:
             return load_from_binance(binance_symbol, start, end)
         except (BinanceAPIException, Exception) as e:
-            logger.warning(f"⚠️ Binance failed: {e}")
+            logger.warning(f"Binance failed: {e}")
     
     return load_from_yahoo(ticker, start, end)
 
