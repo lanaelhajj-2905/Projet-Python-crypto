@@ -7,7 +7,7 @@ import logging
 
 # Imports absolus pour éviter les ImportError
 from src.strategy.data.loaders import load_multiple
-from src.strategy.data.transforms import log_returns_df, split_data
+from src.strategy.data.transforms import compute_log_returns_df as log_returns_df, split_train_val_test as split_data
 from src.strategy.models.selection import select_best_model
 from src.strategy.models.garch import GARCHForecaster
 from src.strategy.strategies.inverse_vol import compute_weights, equal_weight, single_asset
