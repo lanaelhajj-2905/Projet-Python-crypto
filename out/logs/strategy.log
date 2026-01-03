@@ -1,0 +1,61 @@
+2026-01-03 12:23:15,341 - __main__ - INFO - Starting strategy analysis
+2026-01-03 12:23:15,342 - __main__ - INFO - Config: {'tickers': {'BTC': 'BTC-USD', 'ETH': 'ETH-USD', 'XRP': 'XRP-USD', 'ADA': 'ADA-USD', 'SOL': 'SOL-USD', 'DOGE': 'DOGE-USD'}, 'start': '2020-01-01', 'end': '2025-12-31', 'train_start': '2020-04-11', 'val_start': '2022-01-01', 'val_end': '2023-12-31', 'test_start': '2024-01-01', 'test_end': '2025-12-31', 'rebal_freq': 'W-MON', 'cap': 0.35, 'cost_bps': 10}
+2026-01-03 12:23:15,342 - src.strategy.pipelines.strategy_pipeline - INFO - ============================================================
+2026-01-03 12:23:15,343 - src.strategy.pipelines.strategy_pipeline - INFO - STARTING STRATEGY PIPELINE
+2026-01-03 12:23:15,343 - src.strategy.pipelines.strategy_pipeline - INFO - ============================================================
+2026-01-03 12:23:15,343 - src.strategy.pipelines.strategy_pipeline - INFO - 
+[1/5] Loading data
+2026-01-03 12:23:16,025 - src.strategy.data.transforms - INFO - Log returns computed: (2090, 6)
+2026-01-03 12:23:16,028 - src.strategy.pipelines.strategy_pipeline - INFO - 
+[2/5] Model selection
+2026-01-03 12:23:16,028 - src.strategy.models.selection - INFO - === MODEL SELECTION (QLIKE) ===
+2026-01-03 12:23:16,030 - src.strategy.data.transforms - INFO - Split completed: train=630, val=730, test=730
+2026-01-03 12:23:16,031 - src.strategy.models.selection - INFO - Testing GARCH(1,1)-Normal
+2026-01-03 12:23:17,615 - src.strategy.models.selection - INFO -   QLIKE = 3.066353
+2026-01-03 12:23:17,616 - src.strategy.models.selection - INFO - Testing GARCH(1,1)-t
+2026-01-03 12:23:20,740 - src.strategy.models.selection - INFO -   QLIKE = 3.083802
+2026-01-03 12:23:20,740 - src.strategy.models.selection - INFO - Testing EGARCH(1,1)-t
+2026-01-03 12:23:23,618 - src.strategy.models.selection - INFO -   QLIKE = 3.192144
+2026-01-03 12:23:23,618 - src.strategy.models.selection - INFO - Testing GJR-GARCH(1,1)-t
+2026-01-03 12:23:27,489 - src.strategy.models.selection - INFO -   QLIKE = 3.090543
+2026-01-03 12:23:27,507 - src.strategy.pipelines.strategy_pipeline - INFO - Selected: GARCH(1,1)-Normal
+2026-01-03 12:23:27,508 - src.strategy.pipelines.strategy_pipeline - INFO - 
+[3/5] Volatility forecasts
+2026-01-03 12:23:27,508 - src.strategy.models.garch - INFO - Forecasting: 2022-01-01 to 2023-12-31
+2026-01-03 12:23:27,509 - src.strategy.models.garch - INFO - Processing ADA
+2026-01-03 12:23:29,056 - src.strategy.models.garch - INFO - Processing BTC
+2026-01-03 12:23:30,583 - src.strategy.models.garch - INFO - Processing DOGE
+2026-01-03 12:23:32,475 - src.strategy.models.garch - INFO - Processing ETH
+2026-01-03 12:23:34,021 - src.strategy.models.garch - INFO - Processing SOL
+2026-01-03 12:23:35,540 - src.strategy.models.garch - INFO - Processing XRP
+2026-01-03 12:23:37,207 - src.strategy.models.garch - INFO - Forecasting: 2024-01-01 to 2025-12-31
+2026-01-03 12:23:37,209 - src.strategy.models.garch - INFO - Processing ADA
+2026-01-03 12:23:38,923 - src.strategy.models.garch - INFO - Processing BTC
+2026-01-03 12:23:40,560 - src.strategy.models.garch - INFO - Processing DOGE
+2026-01-03 12:23:42,430 - src.strategy.models.garch - INFO - Processing ETH
+2026-01-03 12:23:44,184 - src.strategy.models.garch - INFO - Processing SOL
+2026-01-03 12:23:45,832 - src.strategy.models.garch - INFO - Processing XRP
+2026-01-03 12:23:47,506 - src.strategy.pipelines.strategy_pipeline - INFO - 
+[4/5] Computing weights
+2026-01-03 12:23:47,507 - src.strategy.strategies.inverse_vol - INFO - Computing inverse-vol weights
+2026-01-03 12:23:47,521 - src.strategy.strategies.inverse_vol - INFO - Applying W-MON rebalancing
+2026-01-03 12:23:47,524 - src.strategy.data.transforms - INFO - Generated 105 rebalance dates (W-MON)
+2026-01-03 12:23:47,570 - src.strategy.strategies.inverse_vol - INFO - Weights sum error: 1.00e+00
+2026-01-03 12:23:47,570 - src.strategy.strategies.inverse_vol - INFO - Computing inverse-vol weights
+2026-01-03 12:23:47,574 - src.strategy.strategies.inverse_vol - INFO - Applying W-MON rebalancing
+2026-01-03 12:23:47,576 - src.strategy.data.transforms - INFO - Generated 105 rebalance dates (W-MON)
+2026-01-03 12:23:47,620 - src.strategy.strategies.inverse_vol - INFO - Weights sum error: 1.00e+00
+2026-01-03 12:23:47,621 - src.strategy.pipelines.strategy_pipeline - INFO - 
+[5/5] Backtesting
+2026-01-03 12:23:47,623 - src.strategy.evaluation.backtest - INFO - Backtesting InverseVol_GARCH
+2026-01-03 12:23:47,626 - src.strategy.evaluation.backtest - INFO - Backtesting EqualWeight
+2026-01-03 12:23:47,628 - src.strategy.evaluation.backtest - INFO - Backtesting BTC_Only
+2026-01-03 12:23:47,637 - src.strategy.evaluation.backtest - INFO - Backtesting InverseVol_GARCH
+2026-01-03 12:23:47,639 - src.strategy.evaluation.backtest - INFO - Backtesting EqualWeight
+2026-01-03 12:23:47,641 - src.strategy.evaluation.backtest - INFO - Backtesting BTC_Only
+2026-01-03 12:23:47,649 - src.strategy.pipelines.strategy_pipeline - INFO - 
+============================================================
+2026-01-03 12:23:47,649 - src.strategy.pipelines.strategy_pipeline - INFO - PIPELINE COMPLETED
+2026-01-03 12:23:47,650 - src.strategy.pipelines.strategy_pipeline - INFO - ============================================================
+2026-01-03 12:23:47,660 - __main__ - INFO - 
+Saving results to data/processed/strategy/
