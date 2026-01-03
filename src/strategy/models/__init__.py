@@ -1,7 +1,7 @@
 """Modèles GARCH et sélection de modèle."""
 
-from .garch import GARCHForecaster
-from .selection import select_best_model
+from src.strategy.models.garch import GARCHForecaster
+from src.strategy.models.selection import select_best_model
 
 __all__ = [
     "GARCHForecaster",
