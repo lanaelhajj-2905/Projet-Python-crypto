@@ -4,7 +4,7 @@ Stratégie Inverse Volatility avec rebalancement hebdomadaire.
 
 import numpy as np
 import pandas as pd
-from ..data.transforms import rebalance_dates
+from src.strategy.data import rebalance_dates
 import logging
 
 logger = logging.getLogger(__name__)
