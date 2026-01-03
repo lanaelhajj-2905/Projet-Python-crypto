@@ -1,0 +1,42 @@
+# ============================================================
+# CORE DEPENDENCIES
+# ============================================================
+
+# Data manipulation
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Financial data sources
+yfinance>=0.2.28
+python-binance>=1.0.17
+
+# GARCH models
+arch>=6.0.0
+
+# ============================================================
+# VISUALIZATION (Optional)
+# ============================================================
+
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# ============================================================
+# TESTING & QUALITY (Optional)
+# ============================================================
+
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+
+# ============================================================
+# NOTES
+# ============================================================
+
+# Installation:
+#   pip install -r requirements.txt
+#
+# Core only (minimum):
+#   pip install pandas numpy yfinance python-binance arch
+#
+# Python version: 3.10+
