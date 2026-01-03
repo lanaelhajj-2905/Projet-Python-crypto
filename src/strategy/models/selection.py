@@ -6,7 +6,7 @@ import pandas as pd
 import logging
 from src.strategy.models.garch import GARCHForecaster
 from src.strategy.evaluation.losses import qlike_mean
-from src.strategy.data.transforms import split_data
+from src.strategy.data.transforms import split_train_val_test as split_data
 
 logger = logging.getLogger(__name__)
 

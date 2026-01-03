@@ -7,7 +7,7 @@ Usage:
 
 import logging
 from pathlib import Path
-from src.strategy.pipelines.strategy_pipeline import StrategyPipeline
+from src.strategy.pipelines import StrategyPipeline
 
 
 # Configuration du logging
