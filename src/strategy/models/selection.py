@@ -4,9 +4,9 @@ Sélection du meilleur modèle GARCH via QLIKE.
 
 import pandas as pd
 import logging
-from .garch import GARCHForecaster
-from ..evaluation.losses import qlike_mean
-from ..data.transforms import split_data
+from src.strategy.models.garch import GARCHForecaster
+from src.strategy.evaluation.losses import qlike_mean
+from src.strategy.data.transforms import split_data
 
 logger = logging.getLogger(__name__)
 
