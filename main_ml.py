@@ -26,10 +26,10 @@ def main():
     missing = [s for s in symbols if not (raw_dir / f"{s}_1d.csv").exists()]
 
     if missing:
-        print(f"📥 Téléchargement données manquantes: {missing}")
+        print(f"Téléchargement données manquantes: {missing}")
         downloader.download_binance_public(missing)
     else:
-        print("✅ Données déjà présentes")
+        print("Données déjà présentes")
 
     # ==========================================================
     # 2. RUN STRATEGIES
@@ -60,10 +60,10 @@ def main():
             equity_curves[strat] = res["equity"]
 
         except Exception as e:
-            print(f"❌ Erreur pour {strat}: {e}")
+            print(f"Erreur pour {strat}: {e}")
 
     if not results:
-        print("\n❌ Aucune stratégie n'a fonctionné.")
+        print("Aucune stratégie n'a fonctionné.")
         return
 
     # ==========================================================
@@ -81,7 +81,7 @@ def main():
     for strat, res in results.items():
         res["weights"].to_csv(out_dir / f"{strat}_weights_{timestamp}.csv")
 
-    print("✅ CSV exportés")
+    print("CSV exportés")
 
     # ==========================================================
     # 4. IMAGES
@@ -128,8 +128,8 @@ def main():
         plt.savefig(out_dir / f"weights_{strat}.png")
         plt.close()
 
-    print("🎉 IMAGES générées")
-    print(f"📁 Résultats dans: {out_dir.resolve()}")
+    print("IMAGES générées")
+    print(f"Résultats dans: {out_dir.resolve()}")
 
 
 if __name__ == "__main__":
