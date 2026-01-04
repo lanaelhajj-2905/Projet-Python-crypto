@@ -8,7 +8,7 @@ def main():
     processed_dir = data_dir / "processed" / "ML"
     processed_dir.mkdir(parents=True, exist_ok=True)
 
-    symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]
+    symbols = ["BTCUSDT", "ETHUSDT", "DOGEUSDT", "SOLUSDT", "XRPUSDT","ADAUSDT"]
 
     # 1️⃣ Vérifier si les fichiers existent, sinon télécharger
     files_exist = all((data_dir / f"{s}_1d.csv").exists() for s in symbols)
