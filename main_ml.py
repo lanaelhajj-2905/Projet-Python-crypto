@@ -66,7 +66,7 @@ class PortfolioStrategy:
 def run_portfolio_strategy(symbols=None, start="2021-01-01", end="2025-12-31",
                            strategy="ml_combined"):
     if symbols is None:
-        symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]
+        symbols = ["BTCUSDT", "ETHUSDT", "DOGEUSDT", "SOLUSDT", "XRPUSDT","ADAUSDT"]
 
     # 1️⃣ Charger / télécharger les données
     data_dir = Path("data/raw")
