@@ -2,17 +2,16 @@ import numpy as np
 
 class VolatilityCalculator:
     """Calcule différentes mesures de volatilité"""
-    
+
     @staticmethod
     def add_returns(df):
-        """Log-returns"""
         df = df.copy()
         df["ret"] = np.log(df["close"] / df["close"].shift(1))
         return df
-    
+
     @staticmethod
     def add_volatility_features(df, window=20, lambda_ewma=0.94):
-        """Volatilités simples: rolling, EWMA, Parkinson, Garman-Klass"""
+        df = df.copy()
         
         # Rolling
         df["vol_rolling"] = df["ret"].rolling(window).std()
