@@ -18,7 +18,7 @@ def main():
     # Configuration
     # -----------------------------
     symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]
-    data_dir = "binance_public_data"
+    data_dir = "data/binance_public_data"
     output_dir = "data/processed/ML"
     strategies = [
         "equal_weight",
@@ -39,7 +39,7 @@ def main():
     data_missing = any(not Path(f"{data_dir}/{sym}_1d_2021_2025.csv").exists() for sym in symbols)
 
     if data_missing:
-        print("\n⚠️ Données manquantes, téléchargement depuis Binance...")
+        print("Données manquantes, téléchargement depuis Binance...")
         downloader = DataDownloader(output_dir=data_dir)
         downloader.download_binance_public(symbols=symbols, interval="1d", years=[2021,2022,2023,2024,2025])
         print("✓ Téléchargement terminé !\n")
@@ -69,7 +69,7 @@ def main():
                 all_equity_curves[strat] = res["portfolio"]["equity"]
 
         except Exception as e:
-            print(f"❌ Erreur pour {strat}: {e}")
+            print(f"Erreur pour {strat}: {e}")
             import traceback
             traceback.print_exc()
 
@@ -122,7 +122,7 @@ def main():
             print(f"✓ Dernières courbes (fichier stable): {latest_equity}")
 
     else:
-        print("\n❌ Aucune stratégie n'a fonctionné.")
+        print("\nAucune stratégie n'a fonctionné.")
 
 if __name__ == "__main__":
     main()
