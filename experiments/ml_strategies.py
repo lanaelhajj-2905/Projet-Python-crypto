@@ -1,191 +1,138 @@
-# experiments/ml_strategies.py
+# main_ml.py
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from pathlib import Path
 from datetime import datetime
 
-from experiments.backtester import Backtester
-from experiments.ml_models import StressPredictor, DirectionalPredictor
-from experiments.datasets import build_stress_dataset, build_direction_dataset
-from experiments.volatility import VolatilityCalculator
-from sklearn.metrics import roc_auc_score
+from experiments.data_downloader import DataDownloader
+from experiments.ml_strategies import run_portfolio_strategy
 
 
-class PortfolioStrategy:
-    """Stratégies d'allocation de portefeuille"""
-    
-    @staticmethod
-    def equal_weight(rets):
-        return pd.DataFrame(1.0, index=rets.index, columns=rets.columns)
-    
-    @staticmethod
-    def inverse_volatility(vol):
-        w = 1.0 / vol.replace(0, np.nan)
-        return w.fillna(0.0)
-    
-    @staticmethod
-    def low_volatility_filter(vol, quantile=0.5):
-        q = vol.quantile(quantile, axis=1)
-        return (vol.le(q, axis=0)).astype(float)
-    
-    @staticmethod
-    def ml_risk_gate(p_stress, p_direction=None, mode="hysteresis"):
-        if mode == "hysteresis":
-            P_ON, P_OFF, G_OFF = 0.7, 0.55, 0.2
-            gate = pd.Series(1.0, index=p_stress.index)
-            state = 0
-            for t in p_stress.index:
-                p = float(p_stress.loc[t])
-                if state == 0 and p >= P_ON:
-                    state = 1
-                elif state == 1 and p <= P_OFF:
-                    state = 0
-                gate.loc[t] = (G_OFF if state == 1 else 1.0)
-            return gate
-        elif mode == "smooth":
-            ALPHA = 2.0
-            p_capped = p_stress.clip(0.0, 0.8)
-            return 1.0 / (1.0 + ALPHA * p_capped)
-        elif mode == "combined":
-            if p_direction is None:
-                raise ValueError("p_direction requis pour mode 'combined'")
-            thr_stress = 0.85
-            thr_up_hi = 0.6
-            thr_up_lo = 0.4
-            gate = pd.Series(1.0, index=p_stress.index)
-            stress_hi = (p_stress >= p_stress.quantile(thr_stress))
-            dir_hi = (p_direction >= p_direction.quantile(thr_up_hi))
-            dir_lo = (p_direction <= p_direction.quantile(thr_up_lo))
-            gate.loc[stress_hi & dir_lo] = 0.2
-            gate.loc[stress_hi & dir_hi] = 0.8
-            return gate
+def main():
+    symbols = ["BTCUSDT", "ETHUSDT", "DOGEUSDT", "SOLUSDT", "XRPUSDT", "ADAUSDT"]
 
+    raw_dir = Path("data/raw")
+    out_dir = Path("data/processed/ML")
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-def run_portfolio_strategy(
-    symbols=None,
-    data_dir="data/raw",
-    start="2021-01-01",
-    end="2025-12-31",
-    strategy="ml_combined",
-    cost_bps=10,
-    output_dir="data/processed/ML"
-):
-    """Pipeline complet de stratégie de portefeuille avec export CSV"""
-
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    if symbols is None:
-        symbols = ["BTCUSDT", "ETHUSDT", "DOGEUSDT", "SOLUSDT", "XRPUSDT","ADAUSDT"]
+    # ==========================================================
+    # 1. DOWNLOAD DATA (if missing)
+    # ==========================================================
+    downloader = DataDownloader(output_dir=raw_dir)
+    missing = [s for s in symbols if not (raw_dir / f"{s}_1d.csv").exists()]
 
-    print("="*80)
-    print(f"PORTFOLIO STRATEGY: {strategy}")
-    print("="*80)
+    if missing:
+        print(f"Téléchargement données manquantes: {missing}")
+        downloader.download_binance_public(missing)
+    else:
+        print("Données déjà présentes")
 
-    # --- 1. Charger les données et calculer volatilité ---
-    dfs = {}
-    vc = VolatilityCalculator()
-    for sym in symbols:
-        file_path = Path(data_dir) / f"{sym}_1d.csv"
-        if not file_path.exists():
-            raise FileNotFoundError(f"{file_path} non trouvé. Télécharger avec DataDownloader.")
-        
-        df = pd.read_csv(file_path, parse_dates=["timestamp"], index_col="timestamp").sort_index()
-        df = vc.add_returns(df)
-        df = vc.add_volatility_features(df)
-        df = df.loc[start:end]
-        
-        # Conserver toutes les colonnes utiles
-        dfs[sym] = df[['open','high','low','close','volume','ret','vol_rolling','vol_ewma','vol_parkinson','vol_gk','vol_z']]
+    # ==========================================================
+    # 2. RUN STRATEGIES
+    # ==========================================================
+    strategies = [
+        "equal_weight",
+        "inverse_vol",
+        "low_vol",
+        "ml_stress",
+        "ml_combined"
+    ]
 
-    # Créer DataFrames alignés
-    rets  = pd.DataFrame({s: dfs[s]['ret']    for s in symbols})
-    vol   = pd.DataFrame({s: dfs[s]['vol_rolling'] for s in symbols})
-    close = pd.DataFrame({s: dfs[s]['close']  for s in symbols})
-    high  = pd.DataFrame({s: dfs[s]['high']   for s in symbols})
-    low   = pd.DataFrame({s: dfs[s]['low']    for s in symbols})
-    openp = pd.DataFrame({s: dfs[s]['open']   for s in symbols})
-    volu  = pd.DataFrame({s: dfs[s]['volume'] for s in symbols})
+    results = {}
+    equity_curves = {}
 
-    # --- 2. Stratégie ---
-    ps = PortfolioStrategy()
-    weights = None
+    for strat in strategies:
+        print("\n" + "=" * 90)
+        print(f"RUNNING STRATEGY: {strat}")
+        print("=" * 90)
 
-    if strategy == "equal_weight":
-        weights = ps.equal_weight(rets)
-    elif strategy == "inverse_vol":
-        weights = ps.inverse_volatility(vol)
-    elif strategy == "low_vol":
-        weights = ps.low_volatility_filter(vol)
-    elif strategy in ["ml_stress", "ml_combined"]:
-        # --- ML Stress Dataset ---
-        ds_stress, cutoff = build_stress_dataset(rets, close, high, low, openp, volu)
-        X_train = ds_stress[ds_stress.index < cutoff].drop(columns=["stress"])
-        y_train = ds_stress[ds_stress.index < cutoff]["stress"]
-        X_test = ds_stress[ds_stress.index >= cutoff].drop(columns=["stress"])
-        y_test = ds_stress[ds_stress.index >= cutoff]["stress"]
+        try:
+            res = run_portfolio_strategy(
+                symbols=symbols,
+                data_dir=raw_dir,
+                strategy=strat,
+                output_dir=out_dir
+            )
+            results[strat] = res
+            equity_curves[strat] = res["equity"]
 
-        stress_model = StressPredictor()
-        stress_model.fit(X_train, y_train)
-        p_stress = pd.Series(index=ds_stress.index, dtype=float)
-        p_stress.loc[X_train.index] = stress_model.predict_proba(X_train)
-        p_stress.loc[X_test.index] = stress_model.predict_proba(X_test)
-        print(f"Stress AUC test: {roc_auc_score(y_test, p_stress.loc[X_test.index]):.4f}")
+        except Exception as e:
+            print(f"Erreur pour {strat}: {e}")
 
-        base_weights = ps.low_volatility_filter(vol)
+    if not results:
+        print("Aucune stratégie n'a fonctionné.")
+        return
 
-        if strategy == "ml_stress":
-            gate = ps.ml_risk_gate(p_stress, mode="hysteresis")
-        else:  # ml_combined
-            ds_dir, _ = build_direction_dataset(rets, close, high, low, openp, volu)
-            X_train_dir = ds_dir[ds_dir.index < cutoff].drop(columns=["y_up"])
-            y_train_dir = ds_dir[ds_dir.index < cutoff]["y_up"]
-            X_test_dir = ds_dir[ds_dir.index >= cutoff].drop(columns=["y_up"])
-            y_test_dir = ds_dir[ds_dir.index >= cutoff]["y_up"]
+    # ==========================================================
+    # 3. EXPORT CSV
+    # ==========================================================
+    comparison = pd.DataFrame({k: v["stats"] for k, v in results.items()}).T
 
-            dir_model = DirectionalPredictor(model_type="logit")
-            dir_model.fit(X_train_dir, y_train_dir)
+    comparison.to_csv(out_dir / f"strategy_comparison_{timestamp}.csv")
+    comparison.to_csv(out_dir / "latest_strategy_comparison.csv")
 
-            p_direction = pd.Series(index=ds_dir.index, dtype=float)
-            p_direction.loc[X_train_dir.index] = dir_model.predict_proba(X_train_dir)
-            p_direction.loc[X_test_dir.index] = dir_model.predict_proba(X_test_dir)
-            print(f"Direction AUC test: {roc_auc_score(y_test_dir, p_direction.loc[X_test_dir.index]):.4f}")
+    equity_df = pd.DataFrame(equity_curves)
+    equity_df.to_csv(out_dir / f"equity_curves_{timestamp}.csv")
+    equity_df.to_csv(out_dir / "latest_equity_curves.csv")
 
-            gate = ps.ml_risk_gate(p_stress, p_direction, mode="combined")
+    for strat, res in results.items():
+        res["weights"].to_csv(out_dir / f"{strat}_weights_{timestamp}.csv")
 
-        gate_aligned = gate.reindex(rets.index).ffill().fillna(1.0)
-        weights = base_weights.mul(gate_aligned, axis=0)
+    print("CSV exportés")
 
-    # --- 3. Normalisation finale ---
-    weights = weights.clip(lower=0.0)
-    weights = weights.div(weights.sum(axis=1).replace(0, np.nan), axis=0).fillna(0.0)
+    # ==========================================================
+    # 4. IMAGES
+    # ==========================================================
 
-    # --- 4. Backtest ---
-    bt = Backtester()  # doit être compatible sans arguments
-    port_ret, turnover, _ = bt.run(weights, rets)
-    stats = bt.performance_stats(port_ret)
-    stats["turnover_mean"] = float(turnover.mean())
+    # ---- Equity curves
+    plt.figure(figsize=(12, 6))
+    for strat, eq in equity_curves.items():
+        plt.plot(eq.index, eq, label=strat)
+    plt.title("Equity Curves")
+    plt.xlabel("Date")
+    plt.ylabel("Equity")
+    plt.legend()
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(out_dir / "equity_curves.png")
+    plt.close()
 
-    equity = (1 + port_ret.fillna(0)).cumprod()
+    # ---- Stats heatmap
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(
+        comparison[["ann_return", "ann_vol", "sharpe", "max_dd"]],
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm"
+    )
+    plt.title("Strategy Statistics Heatmap")
+    plt.tight_layout()
+    plt.savefig(out_dir / "stats_heatmap.png")
+    plt.close()
 
-    # --- 5. Export CSV ---
-    comparison_file = output_dir / f"{strategy}_stats_{timestamp}.csv"
-    pd.DataFrame(stats, index=[0]).to_csv(comparison_file)
-    print(f"✓ Statistiques sauvegardées: {comparison_file}")
+    # ---- Weights heatmaps
+    for strat, res in results.items():
+        plt.figure(figsize=(12, 6))
+        sns.heatmap(
+            res["weights"].T,
+            cmap="viridis",
+            cbar_kws={"label": "Weight"}
+        )
+        plt.title(f"Portfolio Weights – {strat}")
+        plt.xlabel("Date")
+        plt.ylabel("Asset")
+        plt.tight_layout()
+        plt.savefig(out_dir / f"weights_{strat}.png")
+        plt.close()
 
-    equity_file = output_dir / f"{strategy}_equity_{timestamp}.csv"
-    equity.to_csv(equity_file)
-    print(f"✓ Equity sauvegardée: {equity_file}")
+    print("IMAGES générées")
+    print(f"Résultats dans: {out_dir.resolve()}")
 
-    weights_file = output_dir / f"{strategy}_weights_{timestamp}.csv"
-    weights.to_csv(weights_file)
-    print(f"✓ Poids sauvegardés: {weights_file}")
 
-    return {
-        "weights": weights,
-        "returns": port_ret,
-        "stats": stats,
-        "equity": equity
-    }
+if __name__ == "__main__":
+    main()
+
