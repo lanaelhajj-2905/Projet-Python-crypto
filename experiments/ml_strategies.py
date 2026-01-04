@@ -67,6 +67,12 @@ def run_portfolio_strategy(
 
     rets = pd.DataFrame({s: dfs[s]["ret"] for s in symbols})
     vol  = pd.DataFrame({s: dfs[s]["vol_rolling"] for s in symbols})
+    close = pd.DataFrame({s: dfs[s]["close"] for s in symbols})
+    high  = pd.DataFrame({s: dfs[s]["high"] for s in symbols})
+    low   = pd.DataFrame({s: dfs[s]["low"] for s in symbols})
+    openp = pd.DataFrame({s: dfs[s]["open"] for s in symbols})
+    volu  = pd.DataFrame({s: dfs[s]["volume"] for s in symbols})
+
 
     ps = PortfolioStrategy()
 
@@ -115,7 +121,8 @@ def run_portfolio_strategy(
             gate = ps.risk_gate(p_stress, mode="stress")
 
         else:
-            ds_dir, _ = build_direction_dataset(rets)
+            ds_dir, _ = build_direction_dataset(rets,close,high,low,openp,volu)
+
 
             dir_model = DirectionalPredictor()
             dir_model.fit(
