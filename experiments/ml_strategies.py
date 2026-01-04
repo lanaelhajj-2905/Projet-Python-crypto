@@ -6,7 +6,6 @@ from pathlib import Path
 from datetime import datetime
 
 from experiments.data_downloader import DataDownloader
-from experiments.ml_strategies import run_portfolio_strategy
 
 
 def main():
