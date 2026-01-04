@@ -388,7 +388,7 @@ Deux benchmarks sont utilisés pour évaluer la performance relative de la strat
 | **Sharpe Ratio** | $(R - R_f) / \sigma$ | Rendement ajusté au risque |
 | **Sortino Ratio** | $R / \text{Downside Dev}$ | Pénalise uniquement volatilité baissière |
 | **Maximum Drawdown** | $\min(\text{Equity} / \text{Peak} - 1)$ | Perte maximale pic-à-creux |
-| **Calmar Ratio** | `R_ann / |MaxDD|' | Rendement par unité de drawdown |
+| **Calmar Ratio** | \frac{R_{ann}}{\left| \text{MaxDD} \right|} | Rendement par unité de drawdown |
 
 
 ## Architecture de la phase 2
