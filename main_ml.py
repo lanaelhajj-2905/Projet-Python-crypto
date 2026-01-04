@@ -55,7 +55,6 @@ def main():
                 symbols=symbols,
                 data_dir=raw_dir,
                 strategy=strat,
-                output_dir=out_dir
             )
             results[strat] = res
             equity_curves[strat] = res["equity"]
