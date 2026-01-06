@@ -300,6 +300,16 @@ Ces actifs ont été retenus pour leurs **corrélations modérées** (0.2-0.7), 
 | EGARCH(1,1)-t | p=1, o=0, q=1 | Student-t |
 | GJR-GARCH(1,1)-t | p=1, o=1, q=1 | Student-t |
 
+**Actif utilisé** :
+
+ La sélection du modèle de volatilité est réalisée uniquement sur le **Bitcoin**. 
+ Nous avons pris cette décision car :
+• Le BTC est l’actif le plus liquide et le plus ancien du marché crypto 
+• Moins de bruit microstructurel est présent
+• La série de rendements est longue
+
+Nous avons donc fait l'hypothèse que la volatilité du bitcoin est représentatif du marché des cryptoactifs. 
+
 **Critère de sélection** : QLIKE (Quasi-Likelihood)
 
 $$\text{QLIKE} = \log(\sigma^2) + \frac{r^2}{\sigma^2}$$
@@ -309,6 +319,19 @@ $$\text{QLIKE} = \log(\sigma^2) + \frac{r^2}{\sigma^2}$$
 - Standard en finance pour évaluer les prévisions de volatilité
 - Pénalise moins les sous-estimations que les sur-estimations
 
+Interprétation du Q-like : Un QLIKE plus faible indique une meilleure capacité à prévoir la volatilité conditionnelle.
+
+**Split temporel**
+
+Les données sont découpées en trois périodes : 
+```
+Training     : 2020-04-11 → 2021-12-31  (apprentissage initial)
+Validation   : 2022-01-01 → 2023-12-31  (sélection du modèle GARCH)
+Test         : 2024-01-01 → 2025-12-31  (évaluation finale)
+```
+
+**Note importante** : Le modèle est sélectionné **uniquement sur la période de validation**. L'évaluation sur le test est **honnête** (pas de re-sélection, pas de data snooping).
+
 **Procédure** :
 1. Estimation walk-forward sur période de validation (2022-2023)
 2. Refit hebdomadaire (W-MON) des paramètres
@@ -316,7 +339,7 @@ $$\text{QLIKE} = \log(\sigma^2) + \frac{r^2}{\sigma^2}$$
 4. Calcul du QLIKE moyen sur la validation
 5. Sélection du modèle avec le **QLIKE le plus faible**
 
-**Résultat attendu** : GARCH(1,1) avec distribution Student-t généralement sélectionné.
+**Résultat** : GARCH(1,1) avec distribution Student-t est sélectionné. Il s'agit du modèle avec le Q-like le plus faible sur la période de validation.
 
 ### 2. Prévisions de volatilité conditionnelle
 
@@ -337,6 +360,7 @@ vols_raw = forecast_volatility(returns, start, end)
 # Pour construire les poids à date t basés sur σ_t :
 vols_aligned = vols_raw.shift(1)  # Shift de 1 jour
 ```
+Ainsi, pour éviter tout biais d'anticipation : les volatilités sont décalés d'un jour et les poids au jour t utilisent uniquement l’information disponible au jour t−1. 
 
 ### 3. Stratégie d'allocation
 
@@ -346,7 +370,7 @@ $$w_i(t) = \frac{1/\sigma_i(t)}{\sum_{j=1}^{N} 1/\sigma_j(t)}$$
 
 **Paramètres** :
 - **Cap** : Poids maximum de 35% par actif (évite concentration excessive)
-- **Rebalancement** : Hebdomadaire (W-MON), poids constants entre refits
+- **Rebalancement** : Hebdomadaire lundi (W-MON), poids constants entre refits
 - **Coûts de transaction** : 10 bps (0.1%) par trade, proportionnels au turnover
 
 **Justification** :
@@ -355,17 +379,6 @@ $$w_i(t) = \frac{1/\sigma_i(t)}{\sum_{j=1}^{N} 1/\sigma_j(t)}$$
 - Pas de prévision de rendements nécessaire (uniquement volatilité)
 - Performance empiriquement supérieure à l'allocation équipondérée sur marchés volatils
 
-### 4. Split temporel
-
-```
-Training     : 2020-04-11 → 2021-12-31  (apprentissage initial)
-Validation   : 2022-01-01 → 2023-12-31  (sélection du modèle GARCH)
-Test         : 2024-01-01 → 2025-12-31  (évaluation honnête)
-```
-
-**Note importante** : Le modèle est sélectionné **uniquement sur la période de validation**. L'évaluation sur le test est **honnête** (pas de re-sélection, pas de data snooping).
-
----
 
 ## Benchmarks
 
