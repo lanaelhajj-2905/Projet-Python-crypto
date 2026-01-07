@@ -89,7 +89,7 @@ LTC, SHIB, ICP, LINK, BCH, NEAR, UNI, ATOM, ETC
 
 La sélection finale privilégie un **équilibre optimal entre diversification et stabilité économétrique** :
 
-- **BTC + ETH** : Duo indispensable capturant les dynamiques fondamentales (réserve de valeur vs. DeFi)
+- **BTC + ETH** : Duo indispensable capturant les dynamiques fondamentales
 - **XRP** : Seul actif à corrélation véritablement modérée, enrichit la matrice de covariance
 - **ADA + SOL** : Plateformes smart contracts complémentaires avec chocs propres
 - **DOGE** : Capture la dimension spéculative/irrationnelle du marché
@@ -291,44 +291,45 @@ Ces actifs ont été retenus pour leurs **corrélations modérées** (0.2-0.7), 
 
 **Modèles candidats testés** :
 
-| Modèle | Spécification | Distribution |
-|--------|---------------|--------------|
-| GARCH(1,1)-Normal | p=1, o=0, q=1 | Normale |
-| **GARCH(1,1)-t** | p=1, o=0, q=1 | **Student-t** |
-| EGARCH(1,1)-t | p=1, o=0, q=1 | Student-t |
-| GJR-GARCH(1,1)-t | p=1, o=1, q=1 | Student-t |
+| Modèle | Spécification | Distribution | Description |
+|--------|---------------|--------------|--------------|
+| GARCH(1,1)-Normal | p=1, o=0, q=1 | Normale | Modèle de référence simple, avec volatilité symétrique et innovations gaussiennes. |
+| **GARCH(1,1)-t** | p=1, o=0, q=1 | **Student-t** | Permet de capturer les queues épaisses, caractéristique empirique majeure des rendements crypto. |
+| EGARCH(1,1)-t | p=1, o=0, q=1 | Student-t | Modélise la variance sous forme logarithmique et autorise des effets asymétriques sans contrainte de positivité. |
+| GJR-GARCH(1,1)-t | p=1, o=1, q=1 | Student-t |Introduit explicitement un effet de levier, où les chocs négatifs peuvent avoir un impact plus important sur la volatilité.|
 
 **Actif utilisé** :
 
  La sélection du modèle de volatilité est réalisée uniquement sur le **Bitcoin**. 
  Nous avons pris cette décision car :
-• Le BTC est l’actif le plus liquide et le plus ancien du marché crypto 
-• Moins de bruit microstructurel est présent
-• La série de rendements est longue
+-Il s’agit du crypto-actif le plus liquide et le plus ancien.
+-Il présente une profondeur de marché plus élevée et moins de bruit.
+-Sa série de rendements est longue et relativement stable ;
+-Il constitue une référence naturelle pour calibrer un modèle générique de volatilité crypto.
 
-Nous avons donc fait l'hypothèse que la volatilité du bitcoin est représentatif du marché des cryptoactifs. 
-
-**Critère de sélection** : QLIKE (Quasi-Likelihood)
-
-$$\text{QLIKE} = \log(\sigma^2) + \frac{r^2}{\sigma^2}$$
-
-**Justification** (Patton, 2011) :
-- Métrique asymétrique robuste aux valeurs extrêmes
-- Standard en finance pour évaluer les prévisions de volatilité
-- Pénalise moins les sous-estimations que les sur-estimations
-
-Interprétation du Q-like : Un QLIKE plus faible indique une meilleure capacité à prévoir la volatilité conditionnelle.
+L’hypothèse sous-jacente est que la dynamique de volatilité du Bitcoin est représentative, au moins qualitativement, de celle du marché crypto dans son ensemble.
 
 **Split temporel**
 
 Les données sont découpées en trois périodes : 
 ```
-Training     : 2020-04-11 → 2021-12-31  (apprentissage initial)
-Validation   : 2022-01-01 → 2023-12-31  (sélection du modèle GARCH)
-Test         : 2024-01-01 → 2025-12-31  (évaluation finale)
+Training     : 2020-04-11 → 2021-12-31  (apprentissage initial) Utilisée pour constituer l’historique initial nécessaire à l’estimation des paramètres.
+Validation   : 2022-01-01 → 2023-12-31  (sélection du modèle GARCH) Utilisée pour comparer les performances de prévision des différents modèles.
+Test         : 2024-01-01 → 2025-12-31  (évaluation finale) Utilisée exclusivement pour l’évaluation finale hors échantillon.
 ```
 
-**Note importante** : Le modèle est sélectionné **uniquement sur la période de validation**. L'évaluation sur le test est **honnête** (pas de re-sélection, pas de data snooping).
+**Note importante** : Le modèle est sélectionné **uniquement sur la période de validation** et n’est pas réajusté sur la période de test, garantissant une évaluation « honnête ».
+
+**Procédure** :
+
+**Critère de sélection** : QLIKE (Quasi-Likelihood)
+
+$$\text{QLIKE} = \log(\sigma^2) + \frac{r^2}{\sigma^2}$$
+
+La QLIKE est une métrique cohérente pour l’évaluation des prévisions de variance et est robuste aux erreurs de spécification du modèle.
+Un score QLIKE plus faible indique une meilleure capacité à prévoir la volatilité conditionnelle.
+
+Interprétation du Q-like : Un QLIKE plus faible indique une meilleure capacité à prévoir la volatilité conditionnelle.
 
 **Procédure** :
 1. Estimation walk-forward sur période de validation (2022-2023)
@@ -337,13 +338,17 @@ Test         : 2024-01-01 → 2025-12-31  (évaluation finale)
 4. Calcul du QLIKE moyen sur la validation
 5. Sélection du modèle avec le **QLIKE le plus faible**
 
-**Résultat** : GARCH(1,1) avec distribution Student-t est sélectionné. Il s'agit du modèle avec le Q-like le plus faible sur la période de validation.
+**Résultat** : GARCH(1,1) avec distribution Student-t est sélectionné. Il s'agit du modèle avec le Q-like le plus faible sur la période de validation. Ce choix est cohérent avec les caractéristiques du marché crypto, notamment la persistance de la volatilité et la présence de queues épaisses.
+
 
 ### 2. Prévisions de volatilité conditionnelle
 
 **Modèle retenu** : GARCH(1,1)-t
 
 $$\sigma^2_{t+1} = \omega + \alpha \cdot r^2_t + \beta \cdot \sigma^2_t$$
+
+La moyenne conditionnelle des rendements est supposée nulle, ce qui est une hypothèse standard à l’horizon journalier.
+Les paramètres sont estimés par maximum de vraisemblance.
 
 **Implémentation** :
 - **Refit hebdomadaire** : Les paramètres (ω, α, β) sont ré-estimés chaque lundi
@@ -372,7 +377,7 @@ $$w_i(t) = \frac{1/\sigma_i(t)}{\sum_{j=1}^{N} 1/\sigma_j(t)}$$
 - **Coûts de transaction** : 10 bps (0.1%) par trade, proportionnels au turnover
 
 **Justification** :
-- Stratégie simple et robuste, largement utilisée en gestion d'actifs
+- Stratégie simple et largement utilisée en gestion d'actifs
 - Égalise la contribution au risque de chaque actif
 - Pas de prévision de rendements nécessaire (uniquement volatilité)
 - Performance empiriquement supérieure à l'allocation équipondérée sur marchés volatils
