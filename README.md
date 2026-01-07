@@ -2,7 +2,7 @@
 
 ## Présentation générale
 
-Ce projet vise à développer une **stratégie d’allocation quantitative sur cryptomonnaies**, fondée sur la **prévision de la volatilité conditionnelle** et une logique explicite de **gestion du risque**.
+Ce projet vise à développer une **stratégie d’allocation quantitative sur cryptomonnaies**, fondée sur la **prévision de la volatilité conditionnelle**. 
 
 Le projet est volontairement structuré en **deux grandes phases distinctes** :
 
@@ -10,8 +10,6 @@ Le projet est volontairement structuré en **deux grandes phases distinctes** :
 2. **Stratégies de trading et allocation**
 
 L'approche repose sur une **séparation stricte entre la donnée, l'analyse statistique et la logique de décision**, afin de garantir robustesse, lisibilité et reproductibilité.
-
-> *Projet réalisé dans le cadre du M2 Gestion d'actifs.*
 
 ---
 
@@ -30,7 +28,7 @@ Cette phase constitue le **socle quantitatif du projet**. Elle est volontairemen
 
 ## Univers retenu
 
-L'univers final est composé de **6 cryptomonnaies**, sélectionnées parmi 18 actifs majeurs analysés, selon une étude détaillée dans `notebooks/universe-research.md`.
+L'univers final est composé de **6 cryptomonnaies**, sélectionnées parmi 18 actifs majeurs analysés.  L'étude détaillée se trouve dans `notebooks/universe-research.md`.
 
 ### Processus de sélection
 
@@ -471,7 +469,7 @@ Tous les fichiers sont exportés dans `data/processed/strategy/` :
 | weights_val.csv | Poids du portefeuille (validation) |
 | weights_test.csv | Poids du portefeuille (test) |
 
-**Note** : Les fichiers `metrics_test.csv` contiennent l'évaluation finale honnête de la stratégie (modèle sélectionné uniquement sur validation).
+**Note** : Les fichiers `metrics_test.csv` contiennent l'évaluation finale de la stratégie (modèle sélectionné uniquement sur validation).
 
 ---
 
@@ -518,10 +516,8 @@ Les résultats sont automatiquement sauvegardés :
 | EqualWeight | -61.80% | -38.20% | 69.36% | -0.551 | -83.44% | 730 |
 | BTC_Only | -32.74% | -17.99% | 54.96% | -0.327 | -73.07% | 730 |
 
-**Interprétation** :
-- **BTC domine** : Sharpe supérieur (-0.327 vs. -0.545) et drawdown plus faible
-- **Diversification altcoins inefficace** en bear market (corrélations élevées)
-- Inverse-Vol et Equal-Weight : performances similaires, faible valeur ajoutée
+Nous pouvons constater que la stratégie bitcoin only s'en sort mieux que les deux autres approches. 
+L'Inverse Volatility et l'equal weight ne parviennent ni à améliorer le rendement ni à réduire le risque : la volatilité annuelle et le drawdown maximal sont en réalité plus élevés que pour BTC Only. Dans un marché baissier, la diversification des cryptoactifs ne permet ni d’atténuer le risque ni de protéger le capital de manière significative.
 
 ### Test (2024-2025) - Bull Market
 
@@ -531,14 +527,8 @@ Les résultats sont automatiquement sauvegardés :
 | EqualWeight | -11.77% | -6.07% | 69.06% | -0.088 | -62.36% | 730 |
 | BTC_Only | +66.50% | +29.03% | 47.90% | +0.606 | -33.12% | 730 |
 
-**Interprétation** :
-- **BTC continue de dominer** : +29% annualisé, Sharpe 0.606
-- **Stratégies diversifiées sous-performent** : Altcoins traînent vs. BTC
-- Inverse-Vol limite les pertes (-0.84%) vs. Equal-Weight (-6.07%)
-- La diversification **réduit le risque** mais **réduit aussi le rendement** en bull BTC
+En marché haussier, la surperformance du Bitcoin only est encore plus marquée. Le Bitcoin affiche un total return de 66,50% alors que les deux autres stratégies ont toujours une performance négative. Une fois encore, la volatilité et le drawdown maximal des stratégies diversifiées sont supérieurs à ceux de BTC Only, ce qui montre que la diversification ne réduit pas réellement le risque et conduit à un rendement moindre. Même en contexte de marché haussier, la stratégie simple BTC Buy-and-Hold demeure la plus efficace.
 
-**Conclusion** :
-Sur les deux périodes (bear + bull), la stratégie simple **BTC Buy-and-Hold surperforme** les stratégies diversifiées. L'allocation Inverse-Vol apporte une **gestion du risque modérée** (MaxDD réduit vs. Equal-Weight) mais sacrifie le rendement. En contexte crypto dominé par BTC, la diversification altcoins **réduit la performance** plus qu'elle ne réduit le risque.
 
 *Les valeurs présentées sont indicatives et dépendent de la période exacte, des paramètres de rebalancement et des coûts de transaction retenus.*
 
