@@ -320,9 +320,9 @@ L’hypothèse sous-jacente est que la dynamique de volatilité du Bitcoin est r
 
 Les données sont découpées en trois périodes : 
 ```
-Training     : 2020-04-11 → 2021-12-31  (apprentissage initial) Utilisée pour constituer l’historique initial nécessaire à l’estimation des paramètres.
-Validation   : 2022-01-01 → 2023-12-31  (sélection du modèle GARCH) Utilisée pour comparer les performances de prévision des différents modèles.
-Test         : 2024-01-01 → 2025-12-31  (évaluation finale) Utilisée exclusivement pour l’évaluation finale hors échantillon.
+Training     : 2018 – 2021  (apprentissage initial) Utilisée pour constituer l’historique initial nécessaire à l’estimation des paramètres.
+Validation   : 2022 - 2023  (sélection du modèle GARCH) Utilisée pour comparer les performances de prévision des différents modèles.
+Test         : 2024 -  2025 (évaluation finale) Utilisée exclusivement pour l’évaluation finale hors échantillon.
 ```
 
 **Note importante** : Le modèle est sélectionné **uniquement sur la période de validation** et n’est pas réajusté sur la période de test, garantissant une évaluation « honnête ».
