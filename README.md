@@ -1,15 +1,22 @@
 # Projet Python
 
+
 ## Présentation générale
 
 Ce projet vise à développer une **stratégie d’allocation quantitative sur cryptomonnaies**, fondée sur la **prévision de la volatilité conditionnelle**. 
 
-Le projet est volontairement structuré en **deux grandes phases distinctes** :
+Le projet est volontairement structuré en **trois grandes phases distinctes** :
 
 1. **Construction de l'univers d'investissement**
 2. **Stratégies de trading et allocation**
+3. **Phase expérimentale complémentaire**
 
 L'approche repose sur une **séparation stricte entre la donnée, l'analyse statistique et la logique de décision**, afin de garantir robustesse, lisibilité et reproductibilité.
+
+## Quick Start
+1. **Phase 1 (Univers)**: `python main_universe.py` -> Définit les 6 actifs.
+2. **Phase 2 (GARCH)**: `python main_strategy.py` -> GARCH et inverse volatilité
+3. **Phase 3 (Stratégie complémentaire)**: `python main_lowvol_trend.py` -> Exécute la stratégie Low-Vol + Trend.
 
 ---
 
@@ -566,45 +573,98 @@ En marché haussier, la surperformance du Bitcoin only est encore plus marquée.
 
 *Les valeurs présentées sont indicatives et dépendent de la période exacte, des paramètres de rebalancement et des coûts de transaction retenus.*
 
-## Phase cimplémentaire : tests de différents stratégies
+## Phase 3 : phase expérimentale expérimentale complémentaire, tests de différentes stratégies
 
-Afin d'aller plus loin dans notre raisonnement nous avons décider de réaliser des tests sur différentes stratégies :
+Afin d'optimiser le couple rendement/risque, nous avons exploré plusieurs approches de gestion de portefeuille, allant de l'allocation classique au Machine Learning.
 
-- **Stratégies de base**:
-   Equal Weight
-   Inverse Volatility (Inv-Vol)
-   Low Volatility (Low-Vol)
+*Stratégies Testées* :
 
-- **Strat avec filtres**:
-   Low-Vol + Trend Filter (Bitcoin MA)
-   Inverse Volatility + Volatility Targeting
-   Inverse Volatility + Trend Filter
-   Inverse Volatility + Stress Filter (règles statistiques)
+- Stratégies de base (Baselines) :
 
-- **Strat avec ML** :
-   Low-Vol + Logistic Regression (risk on / risk off)
-   Inverse Volatility + ML Risk Gate (logistic regression)
-   Inverse Volatility + ML Gate avec hystérésis
-   Inverse Volatility + XGBoost Meta-Model
+  Equal Weight : Allocation uniforme.
+
+  Inverse Volatility (Inv-Vol) : Pondération inverse au risque.
+
+  Low Volatility (Low-Vol) : Sélection des actifs les moins risqués.
+
+- Stratégies avec filtres systématiques :
+
+  Low-Vol + Trend Filter : Sélection Low-Vol couplée à une moyenne mobile sur le Bitcoin.
+
+  Inverse Volatility + Volatility Targeting : Ajustement de l'exposition globale au risque.
+
+  Inverse Volatility + Trend Filter : Superposition d'une tendance macro.
+
+  Inverse Volatility + Stress Filter : Coupure des positions basée sur des indicateurs statistiques de stress.
+
+-  Approches avec Machine Learning (ML) :
+
+   Low-Vol + Régression Logistique : Classification Risk-On / Risk-Off.
+
+   Inverse Volatility + ML Risk Gate : Filtre d'entrée/sortie par apprentissage supervisé.
+
+   Inverse Volatility + ML Gate avec hystérésis : Réduction du turnover (frais) via une zone tampon.
+
+   Inverse Volatility + XGBoost Meta-Model : Prédiction de la performance relative.
 
 Ces différents tests et résultats sont présents dans : `notebook/Machine Learning/`
 
-La stratégie low volatility s'est avéré être la plus efficace afin de réduire la volatilité du portefeuille.
+**Stratégie Retenue : Low Volatility + Trend Filter**
 
-Nous avons ainsi combiné cette approche avec avec un filtre de tendance sur le Bitcoin pour éviter les phases de marché baissier prolongées. En effet, la stratégie Low-Vol + Trend Filter, qui offre le meilleur compromis entre réduction de volatilité et simplicité d'implémentation.
+Après analyse, la stratégie Low Volatility s'est avérée la plus efficace pour réduire la variance du portefeuille. Nous l'avons combinée à un filtre de tendance sur le Bitcoin pour protéger le capital lors des marchés baissiers (Bear Markets) prolongés.
 
-Principe de la stratégie : 
+Cette approche offre le meilleur compromis entre performance ajustée du risque (Sharpe) et simplicité d'implémentation.
 
-- Univers : BTC, ETH, DOGE, SOL, XRP, ADA (données journalières Binance 2021-2026)
+*Principes de fonctionnement* :
 
-- Sélection par volatilité :
-  Chaque jour, on calcule la volatilité rolling sur 20 jours. Seuls les actifs sous la médiane sont conservés dans le portefeuille.
+- Univers d'investissement : BTC, ETH, DOGE, SOL, XRP, ADA (les actifs selectionnés dans la phase 1).
+- Sélection par Volatilité : Calcul de la volatilité glissante sur 20 jours. Seuls les actifs dont la volatilité est inférieure à la médiane de l'univers sont conservés.
+- Filtre de Tendance (Trend Gate) : 
+  Si $Prix_{BTC} < MA200$ : Exposition nulle (100% Cash).Si $Prix_{BTC} > MA200$ : Allocation active.
+- Allocation & Frais : Pondération égale (Equal-Weight) sur les actifs sélectionnés, rebalancement quotidien et intégration des frais de transaction (10 bps).
 
-- Filtre de tendance :
-  Si BTC < MA200 → exposition = 0 (cash)
-  Si BTC > MA200 → allocation active sur les actifs sélectionnés
+*Prérequis*:
 
-- Allocation : Equal-weight sur les actifs validés, rebalancement quotidien, frais de transaction inclus.
+pip install -r requirements.txt
+```
+
+Python 3.8+
+
+## Structure du projet
+```
+.
+├── data/
+│   └── raw/              # Données OHLCV Binance (CSV)
+├── src/
+│   └── lowvol_trend/
+│       ├── loader.py     # Chargement des données
+│       ├── strategy.py   # Logique stratégie
+│       ├── backtest.py   # Moteur de backtest
+├── main_lowvol_trend.py
+└── README.md
+
+### Lancer la stratégie
+
+```bash
+python main_lowvol_trend.py
+```
+## Outputs générés :
+
+Tous les fichiers sont exportés dans `data/processed/lowvol_trend/` :
+
+| Fichier | Description |
+|---------|-------------|
+| equity.png | Equity curve - Low Vol + BTC Trend |
+| stats.csv | Métriques de performance (Annual Return, Sharpe, Max DD, Volatilité)|
+| trend_gate.csv | BTC trend gate |
+| trend_gate.png | Visualisation des phases d'activation (MA200 BTC) |
+| volatility.csv | Historique de la volatilité calculée par actif  |
+| weight.csv | Historique des poids du portefeuille |
+
+
+
+
+
 
 ## Auteur
 
