@@ -16,7 +16,7 @@ L'approche repose sur une **séparation stricte entre la donnée, l'analyse stat
 ## Quick Start
 1. **Phase 1 (Univers)**: `python main_universe.py` -> Définit les 6 actifs.
 2. **Phase 2 (GARCH)**: `python main_strategy.py` -> GARCH et inverse volatilité
-3. **Phase 3 (Stratégie complémentaire)**: `python main_lowvol_trend.py` -> Exécute la stratégie Low-Vol + Trend.
+3. **Phase 3 (Stratégie complémentaire)**: `python second_model_min_vol.py` -> Exécute la stratégie Low-Vol + Trend.
 
 ---
 
@@ -647,7 +647,7 @@ Python 3.8+
 ### Lancer la stratégie
 
 ```bash
-python main_lowvol_trend.py
+python second_model_min_vol.py
 ```
 ## Outputs générés :
 
