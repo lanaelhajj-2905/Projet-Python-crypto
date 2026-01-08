@@ -657,19 +657,17 @@ pip install -r requirements.txt
 Python 3.8+
 
 ## Structure du projet
-```
 .
 ├── data/
 │   └── raw/              # Données OHLCV Binance (CSV)
 ├── src/
 │   └── lowvol_trend/
-        ├── data_downloader.py # téléchargement des données
+│       ├── data_downloader.py # téléchargement des données
 │       ├── loader.py     # Chargement des données
 │       ├── strategy.py   # Logique stratégie
 │       ├── backtest.py   # Moteur de backtest
 ├── main_lowvol_trend.py
 └── README.md
-```
 
 ### Lancer la stratégie
 
