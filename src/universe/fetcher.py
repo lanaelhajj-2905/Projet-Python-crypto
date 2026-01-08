@@ -16,6 +16,8 @@ class InsufficientDataError(Exception):
 class MarketNotFoundError(Exception):
     pass
 
+#Exceptions :
+
 def retry_on_failure(max_retries: int = 3, delay: float = 1.0):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -57,12 +59,14 @@ class CryptoDataFetcher:
         logger.warning(f"Aucune paire trouvée pour {base}")
         return None
 
+#réésai :
     @retry_on_failure()
     def fetch_ohlcv_data(self, symbol: str, timeframe: str, limit: int) -> pd.DataFrame:
         ohlcv = self.exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
         df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms').dt.normalize()
         return df.set_index('timestamp').sort_index().drop_duplicates()
+
 
     def fetch_all_assets(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
         price_series_list, coverage_info, missing_assets = [], [], []
@@ -92,5 +96,9 @@ class CryptoDataFetcher:
         if not price_series_list:
             raise InsufficientDataError("Aucune donnée téléchargée")
         prices_df = pd.concat(price_series_list, axis=1).sort_index()
+        logger.info(f"Données brutes : {len(prices_df)} lignes, {len(price_series_list)} cryptos")
+        prices_df = prices_df.dropna(how="any")
+        logger.info(f"Après alignement : {len(prices_df)} lignes conservées")
+        prices_df = prices_df.dropna(how="any")
         coverage_df = pd.DataFrame(coverage_info).sort_values('first_date')
         return prices_df, coverage_df
