@@ -566,8 +566,45 @@ En marché haussier, la surperformance du Bitcoin only est encore plus marquée.
 
 *Les valeurs présentées sont indicatives et dépendent de la période exacte, des paramètres de rebalancement et des coûts de transaction retenus.*
 
+## Phase cimplémentaire : tests de différents stratégies
 
+Afin d'aller plus loin dans notre raisonnement nous avons décider de réaliser des tests sur différentes stratégies :
 
+- **Stratégies de base**:
+   Equal Weight
+   Inverse Volatility (Inv-Vol)
+   Low Volatility (Low-Vol)
+
+- **Strat avec filtres**:
+   Low-Vol + Trend Filter (Bitcoin MA)
+   Inverse Volatility + Volatility Targeting
+   Inverse Volatility + Trend Filter
+   Inverse Volatility + Stress Filter (règles statistiques)
+
+- **Strat avec ML** :
+   Low-Vol + Logistic Regression (risk on / risk off)
+   Inverse Volatility + ML Risk Gate (logistic regression)
+   Inverse Volatility + ML Gate avec hystérésis
+   Inverse Volatility + XGBoost Meta-Model
+
+Ces différents tests et résultats sont présents dans : `notebook/Machine Learning/`
+
+La stratégie low volatility s'est avéré être la plus efficace afin de réduire la volatilité du portefeuille.
+
+Nous avons ainsi combiné cette approche avec avec un filtre de tendance sur le Bitcoin pour éviter les phases de marché baissier prolongées. En effet, la stratégie Low-Vol + Trend Filter, qui offre le meilleur compromis entre réduction de volatilité et simplicité d'implémentation.
+
+Principe de la stratégie : 
+
+- Univers : BTC, ETH, DOGE, SOL, XRP, ADA (données journalières Binance 2021-2026)
+
+- Sélection par volatilité :
+  Chaque jour, on calcule la volatilité rolling sur 20 jours. Seuls les actifs sous la médiane sont conservés dans le portefeuille.
+
+- Filtre de tendance :
+  Si BTC < MA200 → exposition = 0 (cash)
+  Si BTC > MA200 → allocation active sur les actifs sélectionnés
+
+- Allocation : Equal-weight sur les actifs validés, rebalancement quotidien, frais de transaction inclus.
 
 ## Auteur
 
