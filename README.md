@@ -623,8 +623,17 @@ Afin d'optimiser le couple rendement/risque, nous avons exploré plusieurs appro
 
    Inverse Volatility + XGBoost Meta-Model : Prédiction de la performance relative.
 
-Ces différents tests et résultats sont présents dans : `notebook/Machine Learning/Conclusion_notebook/'.
+Ces différents tests et résultats sont présents dans : `notebook/Machine Learning/`.
 La conclusion détaillée des tests se trouve :  `notebook/Machine Learning/Conlusion_notebook_ML`
+
+*En résumé les conclusions sont les suivantes* :
+Les résultats montrent que les stratégies simples comme l'equal-weight offrent de bonnes performances brutes mais avec une volatilité et des drawdowns très élevés, tandis que les approches inverse-volatilité et low-volatilité sont plus stables mais sacrifient une partie du rendement. 
+
+L'ajout de filtres de risque (tendance Bitcoin, ciblage de volatilité) améliore effectivement la stabilité et réduit les drawdowns, sans pour autant garantir une meilleure performance finale. 
+
+Les modèles de machine learning parviennent à détecter les périodes de stress avec un signal réel mais imparfait (AUC supérieur à 0.5), et leur intégration comme filtre de risque réduit parfois la performance par rapport aux stratégies simples tout en diminuant certains risques. 
+
+Au final, les stratégies complexes testées ont été abandonnées car elles augmentaient le turnover, étaient très sensibles aux paramètres et présentaient des gains non robustes, confirmant que les approches simples restent plus stables, compréhensibles et crédibles pour une application réelle.
 
 **Stratégie Retenue : Low Volatility + Trend Filter**
 
@@ -678,10 +687,6 @@ Tous les fichiers sont exportés dans `data/processed/lowvol_trend/` :
 | trend_gate.png | Visualisation des phases d'activation (MA200 BTC) |
 | volatility.csv | Historique de la volatilité calculée par actif  |
 | weight.csv | Historique des poids du portefeuille |
-
-
-
-
 
 
 ## Auteur

@@ -1,6 +1,6 @@
-Dans ce notebook, l’idée n’était pas de “trouver la meilleure stratégie possible”, mais plutôt de montrer comment on peut **construire, tester et améliorer progressivement des stratégies quantitatives à partir de données de marché**, en comprenant à chaque étape ce qui marche, ce qui ne marche pas, et pourquoi.
+Lors de ces tests, l’idée n’était pas de “trouver la meilleure stratégie possible”, mais plutôt de montrer comment on peut **construire, tester et améliorer progressivement des stratégies quantitatives à partir de données de marché**, en comprenant à chaque étape ce qui marche, ce qui ne marche pas, et pourquoi.
 
-Je suis parti d’un univers simple de cryptomonnaies (BTC, ETH, BNB, SOL, XRP, DOGE) avec des données journalières. 
+Nous sommes parti d’un univers simple de cryptomonnaies (BTC, ETH, BNB, SOL, XRP, DOGE) avec des données journalières. 
 
 Le premier objectif était simplement de mettre en place un cadre propre : chargement des données, calcul des rendements, alignement des dates, et mise en place d’un backtest cohérent avec des coûts de transaction et sans biais de regard vers le futur.
 
@@ -14,7 +14,7 @@ Ces stratégies servent de références. On voit rapidement que l’equal-weight
 
 **Ajouter des filtres simples de risque**
 
-Ensuite, j’ai cherché à améliorer le profil de risque sans complexifier inutilement :
+Ensuite, nous avons cherché à améliorer le profil de risque sans complexifier inutilement :
 
 filtre de tendance basé sur Bitcoin (exposition réduite quand BTC est sous sa moyenne mobile),ciblage de volatilité du portefeuille,mise à l’écart temporaire de certaines positions en période jugée défavorable.
 
@@ -27,7 +27,7 @@ détecter des périodes de stress de marché.
 
 L’idée est simple : quand le marché devient très volatil ou désorganisé, on réduit l’exposition, sans chercher à timer précisément les points hauts ou bas.
 
-J’ai donc construit des *labels de “stress”* basés sur la volatilité future du portefeuille, puis entraîné des modèles simples (logistic regression, random forest, XGBoost) à partir de features intuitives :
+Nous avons donc construit des *labels de “stress”* basés sur la volatilité future du portefeuille, puis entraîné des modèles simples (logistic regression, random forest, XGBoost) à partir de features intuitives :
 
 volatilité moyenne, dispersion entre actifs, momentum du Bitcoin, indicateurs de volume et de range.
 
