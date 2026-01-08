@@ -54,8 +54,12 @@ class DataDownloader:
             if parts:
                 df = pd.concat(parts).sort_index()
                 df = df[~df.index.duplicated(keep="first")]
+                nan_count = df.isna().sum().sum()
+                if nan_count > 0:
+                    print(f"   Note: {nan_count} valeurs manquantes remplacées (ffill)")
+                    df = df.ffill()
                 all_data[symbol] = df
-
+                
                 output_file = self.output_dir / f"{symbol}_{interval}.csv"
                 df.to_csv(output_file)
                 print(f"Sauvegardé: {output_file} ({len(df)} points)")
