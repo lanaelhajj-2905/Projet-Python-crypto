@@ -17,13 +17,7 @@ L'approche repose sur une **séparation stricte entre la donnée, l'analyse stat
 
 Cette phase constitue le **socle quantitatif du projet**. Elle est volontairement **indépendante de toute logique de trading ou d'optimisation**, afin d'éviter tout biais méthodologique.
 
-### Objectifs opérationnels
-
-* Définir un **univers crypto liquide et représentatif**
-* Télécharger, nettoyer et aligner les données de prix historiques
-* Calculer les principales **statistiques de risque et de dépendance**
-* Produire des **outputs exploitables** pour des travaux ultérieurs
-
+L'objectif est de définir un **univers crypto liquide et représentatif**
 --- 
 
 ## Univers retenu
@@ -89,7 +83,7 @@ LTC, SHIB, ICP, LINK, BCH, NEAR, UNI, ATOM, ETC
 
 La sélection finale privilégie un **équilibre optimal entre diversification et stabilité économétrique** :
 
-- **BTC + ETH** : Duo indispensable capturant les dynamiques fondamentales
+- **BTC + ETH** : Duo indispensable jouant des rôles économiques distincts
 - **XRP** : Seul actif à corrélation véritablement modérée, enrichit la matrice de covariance
 - **ADA + SOL** : Plateformes smart contracts complémentaires avec chocs propres
 - **DOGE** : Capture la dimension spéculative/irrationnelle du marché
@@ -221,7 +215,7 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Lancer l'analyse
+### Lancer l'analyse de l'univers d'investissement
 
 ```bash
 # Analyse de l'univers complet (18 cryptos)
@@ -274,18 +268,6 @@ Cette phase exploite l'univers d'investissement construit en Phase 1 pour dével
 ---
 
 **Partie 1 : la selection du modèle de volatilité**
-
-"## Univers de trading
-
-L'univers de trading est constitué des **6 cryptomonnaies** sélectionnées lors de la Phase 1 :
-
-```
-BTC, ETH, XRP, ADA, SOL, DOGE
-```
-
-Ces actifs ont été retenus pour leurs **corrélations modérées** (0.2-0.7), leur **diversité fonctionnelle** et leur **liquidité élevée**, garantissant un équilibre optimal entre diversification et stabilité économétrique."
-
----
 
 1. Données et période d’étude : 
 
@@ -559,7 +541,7 @@ Les résultats sont automatiquement sauvegardés :
 
 ---
 
-## Résultats obtenus
+## Résultats obtenus*
 
 ### Validation (2022-2023) - Bear Market
 
@@ -582,8 +564,9 @@ L'Inverse Volatility et l'equal weight ne parviennent ni à améliorer le rendem
 
 En marché haussier, la surperformance du Bitcoin only est encore plus marquée. Le Bitcoin affiche un total return de 66,50% alors que les deux autres stratégies ont toujours une performance négative. Une fois encore, la volatilité et le drawdown maximal des stratégies diversifiées sont supérieurs à ceux de BTC Only, ce qui montre que la diversification ne réduit pas réellement le risque et conduit à un rendement moindre. Même en contexte de marché haussier, la stratégie simple BTC Buy-and-Hold demeure la plus efficace.
 
-
 *Les valeurs présentées sont indicatives et dépendent de la période exacte, des paramètres de rebalancement et des coûts de transaction retenus.*
+
+
 
 
 ## Auteur
