@@ -53,19 +53,9 @@ class DataDownloader:
 
             if parts:
                 df = pd.concat(parts).sort_index()
-                # 1. Supprimer les doublons
                 df = df[~df.index.duplicated(keep="first")]
-                # 2. Réindexer pour boucher les trous (Gaps)
-                full_index = pd.date_range(start=df.index.min(), end=df.index.max(), freq=interval.replace("1d", "D"))
-                df = df.reindex(full_index)
-                # 3. Traiter les NaN (Interpolation ou Forward Fill)
-                nan_count = df.isna().sum().sum()
-                if nan_count > 0:
-                    print(f"   Note: {nan_count} valeurs manquantes remplacées (ffill)")
-                    df = df.ffill()
-                
                 all_data[symbol] = df
-                # Sauvegarde
+
                 output_file = self.output_dir / f"{symbol}_{interval}.csv"
                 df.to_csv(output_file)
                 print(f"Sauvegardé: {output_file} ({len(df)} points)")
