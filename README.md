@@ -669,6 +669,7 @@ Python 3.8+
 │       ├── backtest.py   # Moteur de backtest
 ├── main_lowvol_trend.py
 └── README.md
+```
 
 ### Lancer la stratégie
 
