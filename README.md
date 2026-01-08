@@ -637,6 +637,7 @@ Python 3.8+
 │   └── raw/              # Données OHLCV Binance (CSV)
 ├── src/
 │   └── lowvol_trend/
+        ├── data_downloader.py # téléchargement des données
 │       ├── loader.py     # Chargement des données
 │       ├── strategy.py   # Logique stratégie
 │       ├── backtest.py   # Moteur de backtest
