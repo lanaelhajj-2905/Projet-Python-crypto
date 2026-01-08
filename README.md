@@ -573,7 +573,23 @@ En marché haussier, la surperformance du Bitcoin only est encore plus marquée.
 
 *Les valeurs présentées sont indicatives et dépendent de la période exacte, des paramètres de rebalancement et des coûts de transaction retenus.*
 
-## Phase 3 : phase expérimentale expérimentale complémentaire, tests de différentes stratégies
+**Conclusion** :
+
+Notre étude met en évidence à la fois les forces et les limites de l’application de stratégies d’allocation fondées sur le risque aux marchés des crypto-actifs.
+
+Bien que la stratégie inverse-volatilité repose sur un cadre rigoureux de prévision de la volatilité (modèle GARCH(1,1)-t sélectionné hors échantillon), les résultats montrent qu’elle sous-performe systématiquement une stratégie simple de type Bitcoin buy-and-hold. 
+Ce constat s’explique principalement par la domination structurelle du Bitcoin au sein de l’écosystème crypto ainsi que par l’inefficacité de la diversification intra-crypto, en particulier lors des périodes de stress de marché.
+D’un point de vue économique, l’allocation inverse-volatilité réduit mécaniquement l’exposition au Bitcoin au profit d’altcoins plus volatils, lesquels présentent généralement des profils de rendement de long terme plus faibles.
+Par ailleurs, sur les marchés crypto, la volatilité ne constitue pas un proxy fiable du risque économique : elle reflète davantage des dynamiques spéculatives, des effets de liquidité et des mouvements de prix guidés par des facteurs narratifs.
+
+Cela étant, la stratégie proposée surperforme un portefeuille équipondéré naïf aussi bien en régime de marché baissier qu’haussier. 
+Ce résultat suggère que le contrôle du risque fondé sur la volatilité apporte une valeur ajoutée par rapport à des approches de diversification simplistes, même s’il ne permet pas de battre l’actif dominant du marché.
+
+Dans l’ensemble, ces résultats indiquent que si les cadres d’allocation fondés sur le risque demeurent des outils pertinents pour la construction de portefeuilles, leur application directe à un univers exclusivement composé de crypto-actifs se heurte à des contraintes structurelles importantes.
+
+---
+
+## Phase 3 : phase expérimentale complémentaire, tests de différentes stratégies
 
 Afin d'optimiser le couple rendement/risque, nous avons exploré plusieurs approches de gestion de portefeuille, allant de l'allocation classique au Machine Learning.
 
@@ -607,7 +623,8 @@ Afin d'optimiser le couple rendement/risque, nous avons exploré plusieurs appro
 
    Inverse Volatility + XGBoost Meta-Model : Prédiction de la performance relative.
 
-Ces différents tests et résultats sont présents dans : `notebook/Machine Learning/`
+Ces différents tests et résultats sont présents dans : `notebook/Machine Learning/Conclusion_notebook/'.
+La conclusion détaillée des tests se trouve :  `notebook/Machine Learning/Conlusion_notebook_ML`
 
 **Stratégie Retenue : Low Volatility + Trend Filter**
 

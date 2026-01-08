@@ -86,7 +86,7 @@ def main():
     results["weights_test"].to_csv("data/processed/strategy/weights_test.csv")
     results["selection"]["results"].to_csv("data/processed/strategy/model_selection.csv", index=False)
     
-    logger.info("✅ Strategy analysis completed")
+    logger.info("Strategy analysis completed")
 
 
 if __name__ == "__main__":
