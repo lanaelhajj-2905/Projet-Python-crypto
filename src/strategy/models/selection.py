@@ -89,7 +89,7 @@ def select_best_model(returns: pd.Series) -> dict:
     df_results = pd.DataFrame(results).sort_values("QLIKE")
     best = df_results.iloc[0].to_dict()
     
-    logger.info(f"\n✅ Best model: {best['Model']}")
+    logger.info(f"Best model: {best['Model']}")
     
     return {
         "best_model": {k: best[k] for k in ["name", "vol", "p", "o", "q", "dist"]},
