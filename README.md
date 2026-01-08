@@ -426,7 +426,7 @@ Deux benchmarks sont utilisés pour évaluer la performance relative de la strat
 
 | Benchmark | Description | Justification |
 |-----------|-------------|---------------|
-| **Equal-Weight (1/N)** | Allocation équipondérée (16.67% par actif) | Stratégie naïve robuste, fréquemment utilisée comme référence académique (DeMiguel et al., 2009) |
+| **Equal-Weight (1/N)** | Allocation équipondérée (16.67% par actif) | Stratégie naïve robuste, fréquemment utilisée comme référence académique |
 | **BTC Buy-and-Hold** | 100% Bitcoin | Référence du marché crypto |
 
 ---
