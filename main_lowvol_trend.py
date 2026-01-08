@@ -5,6 +5,8 @@ from pathlib import Path
 from datetime import datetime
 
 # ---------- imports modules locaux ----------
+from src.lowvol_trend.data_downloader import DataDownloader
+from src.lowvol_trend.loader import load_symbol
 from src.lowvol_trend.loader import load_symbol
 from src.lowvol_trend.strategies import lowvol_trend_strategy
 from src.lowvol_trend.backtest import run_bt, stats
@@ -21,6 +23,16 @@ COST_BPS = 10
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+# =====================
+# DOWNLOAD DATA (Nouveau)
+# =====================
+# On initialise le downloader en pointant vers le dossier DATA_DIR
+downloader = DataDownloader(output_dir=DATA_DIR)
+
+# On télécharge les données manquantes
+# Note : download_binance_public sauvegarde les CSV et retourne un dictionnaire
+downloader.download_binance_public(SYMBOLS, interval="1d", years=[2021, 2022, 2023, 2024, 2025])
 
 # =====================
 # LOAD DATA
