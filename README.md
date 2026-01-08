@@ -273,7 +273,9 @@ Cette phase exploite l'univers d'investissement construit en Phase 1 pour dével
 
 ---
 
-## Univers de trading
+**Partie 1 : la selection du modèle de volatilité**
+
+"## Univers de trading
 
 L'univers de trading est constitué des **6 cryptomonnaies** sélectionnées lors de la Phase 1 :
 
@@ -281,15 +283,29 @@ L'univers de trading est constitué des **6 cryptomonnaies** sélectionnées lor
 BTC, ETH, XRP, ADA, SOL, DOGE
 ```
 
-Ces actifs ont été retenus pour leurs **corrélations modérées** (0.2-0.7), leur **diversité fonctionnelle** et leur **liquidité élevée**, garantissant un équilibre optimal entre diversification et stabilité économétrique.
+Ces actifs ont été retenus pour leurs **corrélations modérées** (0.2-0.7), leur **diversité fonctionnelle** et leur **liquidité élevée**, garantissant un équilibre optimal entre diversification et stabilité économétrique."
 
 ---
 
-## Méthodologie
+1. Données et période d’étude : 
 
-### 1. Sélection du modèle GARCH
+La sélection du modèle de volatilité est réalisée exclusivement sur le Bitcoin (BTC-USD), considéré comme l’actif de référence du marché crypto.
 
-**Modèles candidats testés** :
+• Source des données : Yahoo Finance
+
+• Fréquence : quotidienne
+
+• Période étudiée : janvier 2018 – décembre 2025
+
+Les rendements sont calculés sous forme de rendements logarithmiques en pourcentage :
+r_t = 100 × ln(P_t / P_{t-1})
+
+Contrairement aux marchés actions, les marchés de crypto-actifs fonctionnent en continu (24h/24, 7j/7) et ne disposent pas d’une heure de clôture officielle. Les prix de clôture fournis par Yahoo Finance correspondent à une coupure calendaire quotidienne à 00:00 UTC. 
+Cette convention, bien qu’arbitraire, est appliquée de manière cohérente dans le temps et entre actifs, ce qui permet la construction de séries de rendements journaliers comparables.
+
+
+
+2. Modèles candidats testés :
 
 | Modèle | Spécification | Distribution | Description |
 |--------|---------------|--------------|--------------|
@@ -298,7 +314,9 @@ Ces actifs ont été retenus pour leurs **corrélations modérées** (0.2-0.7), 
 | EGARCH(1,1)-t | p=1, o=0, q=1 | Student-t | Modélise la variance sous forme logarithmique et autorise des effets asymétriques sans contrainte de positivité. |
 | GJR-GARCH(1,1)-t | p=1, o=1, q=1 | Student-t |Introduit explicitement un effet de levier, où les chocs négatifs peuvent avoir un impact plus important sur la volatilité.|
 
-**Actif utilisé** :
+Ces modèles couvrent les principales extensions utilisées dans la littérature académique sur la volatilité conditionnelle.
+
+3. Justification du choix du Bitcoin pour la sélection :
 
  La sélection du modèle de volatilité est réalisée uniquement sur le **Bitcoin**. 
  Nous avons pris cette décision car :
@@ -309,7 +327,7 @@ Ces actifs ont été retenus pour leurs **corrélations modérées** (0.2-0.7), 
 
 L’hypothèse sous-jacente est que la dynamique de volatilité du Bitcoin est représentative, au moins qualitativement, de celle du marché crypto dans son ensemble.
 
-**Split temporel**
+4. Split temporel : Découpage Train / Validation / Test** :
 
 Les données sont découpées en trois périodes : 
 ```
@@ -320,9 +338,10 @@ Test         : 2024-01-01 → 2025-12-31  (évaluation finale) Utilisée exclusi
 
 **Note importante** : Le modèle est sélectionné **uniquement sur la période de validation** et n’est pas réajusté sur la période de test, garantissant une évaluation « honnête ».
 
-**Procédure** :
 
-**Critère de sélection** : QLIKE (Quasi-Likelihood)
+5. Critère de sélection : QLIKE (Quasi-Likelihood) : 
+
+La comparaison des modèles repose sur la fonction de perte QLIKE :
 
 $$\text{QLIKE} = \log(\sigma^2) + \frac{r^2}{\sigma^2}$$
 
@@ -331,19 +350,13 @@ La QLIKE est une métrique cohérente pour l’évaluation des prévisions de va
 
 Interprétation du Q-like : Un QLIKE plus faible indique une meilleure capacité à prévoir la volatilité conditionnelle.
 
-**Procédure** :
-1. Estimation walk-forward sur période de validation (2022-2023)
-2. Refit hebdomadaire (W-MON) des paramètres
-3. Forecast 1-step-ahead de la variance conditionnelle
-4. Calcul du QLIKE moyen sur la validation
-5. Sélection du modèle avec le **QLIKE le plus faible**
+6. Modèle retenu : GARCH(1,1)-t :
 
-**Résultat** : GARCH(1,1) avec distribution Student-t est sélectionné. Il s'agit du modèle avec le Q-like le plus faible sur la période de validation. Ce choix est cohérent avec les caractéristiques du marché crypto, notamment la persistance de la volatilité et la présence de queues épaisses.
+Le modèle présentant le score QLIKE le plus faible sur la période de validation est : 
+GARCH(1,1) avec innovations Student-t.
+Ce choix est cohérent avec les caractéristiques du marché crypto, notamment la persistance de la volatilité et la présence de queues épaisses.
 
-
-### 2. Prévisions de volatilité conditionnelle
-
-**Modèle retenu** : GARCH(1,1)-t
+Le modèle retenu est défini par :
 
 $$\sigma^2_{t+1} = \omega + \alpha \cdot r^2_t + \beta \cdot \sigma^2_t$$
 
@@ -351,11 +364,13 @@ La moyenne conditionnelle des rendements est supposée nulle, ce qui est une hyp
 Les paramètres sont estimés par maximum de vraisemblance.
 
 **Implémentation** :
-- **Refit hebdomadaire** : Les paramètres (ω, α, β) sont ré-estimés chaque lundi
+- Les paramètres du modèle (ω, α, β) sont ré-estimés chaque lundi
+- Entre deux recalibrages, les paramètres sont maintenus constants, tandis que la variance conditionnelle est mise à jour quotidiennement via la récursion GARCH.
+- Un nombre minimal de 250 observations est requis avant toute estimation afin de garantir la stabilité des paramètres.
 - **Update quotidien** : Entre deux refits, la variance conditionnelle est mise à jour quotidiennement via la récursion GARCH
 - **Forecast next-day** : La volatilité prévue σ_{t+1} est stockée à la date t
 
-**Alignement temporel critique** :
+7. Alignement temporel critique :
 ```python
 # Les forecasts sont stockés comme σ_{t+1} à date t
 vols_raw = forecast_volatility(returns, start, end)
@@ -363,27 +378,60 @@ vols_raw = forecast_volatility(returns, start, end)
 # Pour construire les poids à date t basés sur σ_t :
 vols_aligned = vols_raw.shift(1)  # Shift de 1 jour
 ```
-Ainsi, pour éviter tout biais d'anticipation : les volatilités sont décalés d'un jour et les poids au jour t utilisent uniquement l’information disponible au jour t−1. 
+La récursion GARCH produit une prévision de volatilité à un jour (σ̂_{t+1}).
 
-### 3. Stratégie d'allocation
+Afin d’éviter tout biais d’anticipation, les séries de volatilité sont décalées d’un jour avant d’être utilisées pour la construction des signaux.
+Ainsi, les décisions prises au jour t reposent exclusivement sur l’information disponible au jour t−1.
 
-**Stratégie** : Inverse Volatility (Risk Parity)
+
+**Partie 2. Stratégie d'allocation**
+
+1. Univers d’investissement et données :
+
+La stratégie est appliquée à l'univers composé de six crypto-actifs de la phase 1 :
+BTC, ETH, XRP, ADA, SOL et DOGE.
+
+• Source des données : Yahoo Finance
+
+• Fréquence : quotidienne
+
+Contrairement à la sélection du modèle (Partie 1), l’univers multi-actifs ne dispose pas de données suffisamment longues avant 2020 pour l’ensemble des crypto-actifs. L’analyse de portefeuille débute donc plus tard.
+
+2. Périodes Train / Validation / Test (stratégie multi-actifs) : 
+
+Pour la stratégie d’allocation, les périodes sont définies comme suit :
+
+1 - Train : 2020 – 2021  : Historique initial nécessaire pour produire les premières prévisions de volatilité.
+2 - Validation : 2022 – 2023 : Utilisée pour analyser le comportement et la cohérence de la stratégie.
+3 - Test : 2024 – 2025 : Période d’évaluation finale hors échantillon.
+
+Cette différence de découpage par rapport à la Partie 1 s’explique par la disponibilité des données sur l’ensemble de l’univers.
+
+3. Prévisions de volatilité multi-actifs : 
+
+Pour chaque crypto-actif, la volatilité conditionnelle est estimée à l’aide du même modèle GARCH(1,1)-t sélectionné précédemment.
+
+Les règles de recalibrage, de mise à jour et d’alignement temporel sont strictement identiques pour tous les actifs.
+
+
+4. Stratégie : Inverse Volatility (Risk Parity) :
+
+Les poids du portefeuille sont définis comme proportionnels à l’inverse de la volatilité estimée :
 
 $$w_i(t) = \frac{1/\sigma_i(t)}{\sum_{j=1}^{N} 1/\sigma_j(t)}$$
 
-**Paramètres** :
-- **Cap** : Poids maximum de 35% par actif (évite concentration excessive)
-- **Rebalancement** : Hebdomadaire lundi (W-MON), poids constants entre refits
-- **Coûts de transaction** : 10 bps (0.1%) par trade, proportionnels au turnover
+**Cette approche vise à** :
+-Allouer davantage de capital aux actifs moins volatils.
+-Equilibrer les contributions au risque.
+-Limiter l’exposition aux actifs extrêmement volatils.
 
-**Justification** :
-- Stratégie simple et largement utilisée en gestion d'actifs
-- Égalise la contribution au risque de chaque actif
-- Pas de prévision de rendements nécessaire (uniquement volatilité)
-- Performance empiriquement supérieure à l'allocation équipondérée sur marchés volatils
+5. Paramètres :
+- **Plafonnement** : Poids maximum de 35% par actif (évite concentration excessive)
+- **Rebalancement** : Hebdomadaire lundi (W-MON), poids constants entre refits et aucune position n’est prise tant qu’aucun signal de volatilité valide n’est disponible.
+- **Coûts de transaction** : 10 bps (0.1%) par trade. Les coûts de transaction sont modélisés de manière linéaire comme proportionnels au turnover du portefeuille : coût_t = (bps / 10000) × Σ_i |w_{t,i} − w_{t−1,i}. Cette modélisation constitue une approximation standard, sans prise en compte explicite de l’impact de marché.
 
 
-## Benchmarks
+6. Benchmarks :
 
 Deux benchmarks sont utilisés pour évaluer la performance relative de la stratégie :
 
@@ -394,7 +442,7 @@ Deux benchmarks sont utilisés pour évaluer la performance relative de la strat
 
 ---
 
-## Métriques d'évaluation
+7. Métriques d'évaluation :
 
 | Métrique | Formule | Interprétation |
 |----------|---------|----------------|
